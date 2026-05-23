@@ -58,10 +58,23 @@ def _get(url):
     return None
 
 def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
-    url = f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}"
-    log.info(f"Buscando: {keyword!r}")
+    # Tenta múltiplas URLs para achar ofertas
+    urls = [
+        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}&deals-widget=1",
+        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}&rh=p_n_specials_match%3A15509814011",
+        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}+oferta",
+        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}+desconto",
+    ]
 
-    html = _get(url)
+    html = None
+    for url in urls:
+        log.info(f"Buscando: {url}")
+        html = _get(url)
+        if html:
+            blocos = html.split('data-component-type="s-search-result"')
+            if len(blocos) > 2:
+                break
+
     if not html:
         return []
 
@@ -106,13 +119,10 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
 
             for p in todos_precos:
                 p_limpo = p.replace("\xa0", " ").strip()
-
                 if p_limpo.startswith("De:"):
-                    # É o preço antigo
                     if preco_antigo_str is None:
                         preco_antigo_str = p_limpo
                 else:
-                    # É preço atual — ignora parcelas pequenas
                     val = _preco_float(p_limpo)
                     if val and val > 50 and preco_atual_str is None:
                         preco_atual_str = p_limpo
@@ -132,6 +142,7 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
                         preco_antigo_float = round(preco_float / (1 - desconto / 100), 2)
                         preco_antigo_str = f"R$ {preco_antigo_float:.2f}"
 
+            # Aceita produto mesmo sem desconto se desc_minimo=0
             if desconto < desc_minimo:
                 continue
 
@@ -184,4 +195,4 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
     return produtos
 
 def buscar_ofertas_relampago(limite=5):
-    return buscar_produtos("ofertas", desc_minimo=0, limite=limite)
+    return buscar_produtos("oferta relampago amazon", desc_minimo=0, limite=limite)
