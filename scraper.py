@@ -46,24 +46,21 @@ def _desconto(atual, antigo):
     return 0
 
 def _get(url):
-    for i in range(3):
+    for i in range(2):
         try:
-            time.sleep(random.uniform(2, 4))
-            r = _session.get(url, headers=_headers(), timeout=15)
+            time.sleep(random.uniform(0.5, 1.5))
+            r = _session.get(url, headers=_headers(), timeout=10)
             if r.status_code == 200:
                 return r.text
         except Exception as e:
             log.error(f"Erro GET tentativa {i+1}: {e}")
-        time.sleep(3)
+        time.sleep(1)
     return None
 
 def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
-    # Tenta múltiplas URLs para achar ofertas
     urls = [
         f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}&deals-widget=1",
-        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}&rh=p_n_specials_match%3A15509814011",
-        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}+oferta",
-        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}+desconto",
+        f"https://www.amazon.com.br/s?k={requests.utils.quote(keyword)}+oferta+desconto",
     ]
 
     html = None
@@ -85,11 +82,9 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
 
     for bloco in blocos[1:]:
         try:
-            # Pula patrocinados
             if "AdHolder" in bloco or '"adIndex"' in bloco:
                 continue
 
-            # Nome
             nome = None
             for sel in [
                 'a-size-base-plus a-spacing-none a-color-base a-text-normal">',
@@ -111,7 +106,6 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
             if any(x in nome for x in ["Ver informações", "Escolha da Amazon", "patrocinado"]):
                 continue
 
-            # Todos os preços do bloco
             todos_precos = re.findall(r'a-offscreen">([^<]+)</span>', bloco)
 
             preco_atual_str = None
@@ -129,11 +123,8 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
 
             preco_float = _preco_float(preco_atual_str)
             preco_antigo_float = _preco_float(preco_antigo_str)
-
-            # Desconto
             desconto = _desconto(preco_float, preco_antigo_float)
 
-            # Badge de % como fallback
             if desconto == 0:
                 m = re.search(r'(\d+)%\s*de\s*desconto|[-–](\d+)%', bloco)
                 if m:
@@ -142,14 +133,12 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
                         preco_antigo_float = round(preco_float / (1 - desconto / 100), 2)
                         preco_antigo_str = f"R$ {preco_antigo_float:.2f}"
 
-            # Aceita produto mesmo sem desconto se desc_minimo=0
             if desconto < desc_minimo:
                 continue
 
             if preco_float and (preco_float < PRECO_MINIMO or preco_float > PRECO_MAXIMO):
                 continue
 
-            # Link
             hrefs = re.findall(r'href="(/dp/[A-Z0-9]{10}[^"]*)"', bloco)
             if not hrefs:
                 hrefs = re.findall(r'href="(/[^"]*?/dp/[A-Z0-9]{10}[^"]*)"', bloco)
@@ -157,13 +146,11 @@ def buscar_produtos(keyword, desc_minimo=DESCONTO_MINIMO, limite=5):
                 continue
             link = _link_afiliado("https://www.amazon.com.br" + hrefs[0].split("?")[0])
 
-            # Imagem
             imagem = ""
             m = re.search(r'src="(https://m\.media-amazon\.com/images/[^"]+)"', bloco)
             if m:
                 imagem = m.group(1)
 
-            # Rating
             rating = ""
             m = re.search(r'(\d[,.]\d)\s*de\s*5\s*estrelas', bloco)
             if m:
