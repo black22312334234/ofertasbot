@@ -56,17 +56,19 @@ def menu_principal():
     ])
 
 
+GRUPOS = {
+    "📱 Tecnologia": ["smartphone", "headset gamer", "fone de ouvido bluetooth", "smartwatch", "tablet", "notebook", "monitor gamer", "teclado mecânico", "mouse sem fio", "SSD"],
+    "🏠 Casa": ["air fryer", "aspirador de pó", "panela elétrica", "ventilador torre", "cafeteira", "liquidificador", "micro-ondas"],
+    "💪 Esportes": ["tênis esportivo", "whey protein", "suplemento alimentar", "bicicleta ergométrica", "halteres", "tapete de yoga"],
+    "💄 Beleza": ["secador de cabelo", "prancha de cabelo", "perfume importado", "kit skincare", "barbeador elétrico"],
+    "📚 Livros": ["livro autoajuda", "livro bestseller", "livro infantil", "mangá"],
+    "👶 Bebês": ["carrinho de bebê", "berço", "fralda", "banheira de bebê", "brinquedo bebê"],
+}
+
 def menu_categorias():
-    cats = config.CATEGORIAS[:12]  # Máximo 12 botões
     botoes = []
-    linha = []
-    for i, cat in enumerate(cats):
-        linha.append(InlineKeyboardButton(cat.title(), callback_data=f"cat_{cat}"))
-        if len(linha) == 2:
-            botoes.append(linha)
-            linha = []
-    if linha:
-        botoes.append(linha)
+    for nome in GRUPOS:
+        botoes.append([InlineKeyboardButton(nome, callback_data=f"grupo_{nome}")])
     botoes.append([InlineKeyboardButton("⬅️ Voltar", callback_data="cb_menu")])
     return InlineKeyboardMarkup(botoes)
 
@@ -179,6 +181,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.reply_text(
             "🗂️ Escolha uma categoria:", reply_markup=menu_categorias()
         )
+
+    elif data.startswith("grupo_"):
+        keyword = random.choice(GRUPOS.get(data[6:], config.CATEGORIAS))
+        await query.message.reply_text(f"🔍 Buscando em <b>{data[6:]}</b>...", parse_mode=ParseMode.HTML)
+        await _executar_busca(query.message, context.bot, keyword, usuario=True)
 
     elif data.startswith("cat_"):
         keyword = data[4:]
