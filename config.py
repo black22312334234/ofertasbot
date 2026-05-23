@@ -15,8 +15,8 @@ PRECO_MAXIMO      = 5000.0
 PRECO_MINIMO      = 20.0
 
 # ── AGENDAMENTO ───────────────────────────────────────────────
-INTERVALO_CANAL   = 15
-INTERVALO_BUSCA   = 30
+INTERVALO_CANAL   = 30
+INTERVALO_BUSCA   = 50
 
 # ── CATEGORIAS PARA POSTAGEM AUTOMÁTICA ──────────────────────
 CATEGORIAS = [
