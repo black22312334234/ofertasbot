@@ -57,12 +57,16 @@ def menu_principal():
 
 
 GRUPOS = {
-    "📱 Tecnologia": ["smartphone", "headset gamer", "fone de ouvido bluetooth", "smartwatch", "tablet", "notebook", "monitor gamer", "teclado mecânico", "mouse sem fio", "SSD"],
-    "🏠 Casa": ["air fryer", "aspirador de pó", "panela elétrica", "ventilador torre", "cafeteira", "liquidificador", "micro-ondas"],
-    "💪 Esportes": ["tênis esportivo", "whey protein", "suplemento alimentar", "bicicleta ergométrica", "halteres", "tapete de yoga"],
-    "💄 Beleza": ["secador de cabelo", "prancha de cabelo", "perfume importado", "kit skincare", "barbeador elétrico"],
-    "📚 Livros": ["livro autoajuda", "livro bestseller", "livro infantil", "mangá"],
-    "👶 Bebês": ["carrinho de bebê", "berço", "fralda", "banheira de bebê", "brinquedo bebê"],
+    "🎮 Games": ["controle gamer", "headset gamer", "cadeira gamer", "monitor gamer", "teclado mecânico", "mouse gamer", "jogo ps5", "jogo xbox"],
+    "🎵 Música": ["fone de ouvido bluetooth", "caixa de som bluetooth", "violão", "teclado musical", "microfone"],
+    "🏠 Casa": ["air fryer", "aspirador de pó", "panela elétrica", "cafeteira", "liquidificador", "micro-ondas", "ventilador", "purificador de água"],
+    "⚡ Eletrônicos": ["smartphone", "tablet", "notebook", "smartwatch", "SSD", "carregador rápido", "câmera de segurança", "impressora"],
+    "🧸 Brinquedos": ["lego", "boneca", "carrinho de brinquedo", "brinquedo educativo", "quebra cabeça"],
+    "📚 Livros": ["livro autoajuda", "livro bestseller", "livro infantil", "mangá", "livro de receitas"],
+    "💻 Computadores": ["notebook", "monitor", "teclado mecânico", "mouse sem fio", "SSD", "memória ram", "webcam"],
+    "💄 Beleza": ["secador de cabelo", "prancha de cabelo", "perfume importado", "kit skincare", "barbeador elétrico", "escova dental elétrica"],
+    "🛒 Mais Vendidos": ["air fryer", "smartphone", "fone de ouvido bluetooth", "smartwatch", "notebook", "cafeteira"],
+    "🏷️ Ofertas do Dia": ["oferta relampago", "desconto amazon", "promocao", "mais vendidos desconto"],
 }
 
 def menu_categorias():
